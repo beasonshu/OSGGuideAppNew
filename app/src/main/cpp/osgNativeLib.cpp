@@ -1,76 +1,113 @@
-
-/*
-This file is part of OpenSceneGraph cross-platform guide:
-  https://github.com/OGStudio/openscenegraph-cross-platform-guide
-
-Copyright (C) 2017 Opensource Game Studio
-
-This software is provided 'as-is', without any express or implied
-warranty.  In no event will the authors be held liable for any damages
-arising from the use of this software.
-
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it
-freely, subject to the following restrictions:
-
-1. The origin of this software must not be misrepresented; you must not
-   claim that you wrote the original software. If you use this software
-   in a product, an acknowledgment in the product documentation would be
-   appreciated but is not required.
-2. Altered source versions must be plainly marked as such, and must not be
-   misrepresented as being the original software.
-3. This notice may not be removed or altered from any source distribution.
-*/
-
-#include "main.h"
-
+#include <string.h>
 #include <jni.h>
-#include <string>
+#include <android/log.h>
 
-// Shortcuts for JNI functions.
-#define OSG_JNI(FUNC_NAME) \
-    JNIEXPORT void JNICALL Java_org_opengamestudio_osgapp_osgNativeLib_ ## FUNC_NAME
-#define OSG_JNI_ARG \
-    JNIEnv *env, jobject /* this */
+#include <iostream>
 
-// Mouse (pointer) speed multiplier.
-const float MOUSE_MOTION_FACTOR = 0.01;
+#include "OsgMainApp.hpp"
 
-// Create application instance.
-Application app;
+OsgMainApp mainApp;
 
 extern "C" {
+    JNIEXPORT void JNICALL Java_osg_AndroidExample_osgNativeLib_init(JNIEnv * env, jobject obj, jint width, jint height);
+    JNIEXPORT void JNICALL Java_osg_AndroidExample_osgNativeLib_step(JNIEnv * env, jobject obj);
+    JNIEXPORT void JNICALL Java_osg_AndroidExample_osgNativeLib_clearContents(JNIEnv * env, jobject obj);
+    JNIEXPORT void JNICALL Java_osg_AndroidExample_osgNativeLib_mouseButtonPressEvent(JNIEnv * env, jobject obj, jfloat x, jfloat y, jint button);
+    JNIEXPORT void JNICALL Java_osg_AndroidExample_osgNativeLib_mouseButtonReleaseEvent(JNIEnv * env, jobject obj, jfloat x, jfloat y, jint button);
+    JNIEXPORT void JNICALL Java_osg_AndroidExample_osgNativeLib_mouseMoveEvent(JNIEnv * env, jobject obj, jfloat x, jfloat y);
+    JNIEXPORT void JNICALL Java_osg_AndroidExample_osgNativeLib_keyboardDown(JNIEnv * env, jobject obj, jint key);
+    JNIEXPORT void JNICALL Java_osg_AndroidExample_osgNativeLib_keyboardUp(JNIEnv * env, jobject obj, jint key);
+    JNIEXPORT jintArray JNICALL Java_osg_AndroidExample_osgNativeLib_getClearColor(JNIEnv * env, jobject obj);
+    JNIEXPORT void JNICALL Java_osg_AndroidExample_osgNativeLib_setClearColor(JNIEnv * env, jobject obj, jint red, jint green, jint blue);
+    JNIEXPORT void JNICALL Java_osg_AndroidExample_osgNativeLib_loadObject(JNIEnv * env, jobject obj, jstring address);
+    JNIEXPORT void JNICALL Java_osg_AndroidExample_osgNativeLib_unLoadObject(JNIEnv * env, jobject obj, jint number);
+    JNIEXPORT jobjectArray JNICALL Java_osg_AndroidExample_osgNativeLib_getObjectNames(JNIEnv * env, jobject obj);
+};
 
-// Initialization.
-OSG_JNI(init)(OSG_JNI_ARG, jint width, jint height)
-{
-    app.setupWindow(width, height);
+JNIEXPORT void JNICALL Java_osg_AndroidExample_osgNativeLib_init(JNIEnv * env, jobject obj, jint width, jint height){
+    mainApp.initOsgWindow(0,0,width,height);
 }
-
-// Rendering.
-OSG_JNI(step)(OSG_JNI_ARG)
-{
-    app.frame();
+JNIEXPORT void JNICALL Java_osg_AndroidExample_osgNativeLib_step(JNIEnv * env, jobject obj){
+    mainApp.draw();
 }
-
-// Resources.
-OSG_JNI(loadModel)(OSG_JNI_ARG, jstring path)
-{
-    const char *cpath = env->GetStringUTFChars(path, JNI_FALSE);
-    app.loadScene(cpath);
-    env->ReleaseStringUTFChars(path, cpath);
+JNIEXPORT void JNICALL Java_osg_AndroidExample_osgNativeLib_clearContents(JNIEnv * env, jobject obj){
+    mainApp.clearScene();
 }
-
-// Input.
-OSG_JNI(moveMouse)(OSG_JNI_ARG, jfloat x, jfloat y)
-{
-    app.moveMouse(x * MOUSE_MOTION_FACTOR, y * MOUSE_MOTION_FACTOR);
+JNIEXPORT void JNICALL Java_osg_AndroidExample_osgNativeLib_mouseButtonPressEvent(JNIEnv * env, jobject obj, jfloat x, jfloat y, jint button){
+    mainApp.mouseButtonPressEvent(x,y,button);
 }
-
-OSG_JNI(pressMouse)(OSG_JNI_ARG, jboolean down, jfloat x, jfloat y)
-{
-    app.pressMouse(down == JNI_TRUE, x * MOUSE_MOTION_FACTOR, y * MOUSE_MOTION_FACTOR);
+JNIEXPORT void JNICALL Java_osg_AndroidExample_osgNativeLib_mouseButtonReleaseEvent(JNIEnv * env, jobject obj, jfloat x, jfloat y, jint button){
+    mainApp.mouseButtonReleaseEvent(x,y,button);
 }
+JNIEXPORT void JNICALL Java_osg_AndroidExample_osgNativeLib_mouseMoveEvent(JNIEnv * env, jobject obj, jfloat x, jfloat y){
+    mainApp.mouseMoveEvent(x,y);
+}
+JNIEXPORT void JNICALL Java_osg_AndroidExample_osgNativeLib_keyboardDown(JNIEnv * env, jobject obj, jint key){
+    mainApp.keyboardDown(key);
+}
+JNIEXPORT void JNICALL Java_osg_AndroidExample_osgNativeLib_keyboardUp(JNIEnv * env, jobject obj, jint key){
+    mainApp.keyboardUp(key);
+}
+JNIEXPORT jintArray JNICALL Java_osg_AndroidExample_osgNativeLib_getClearColor(JNIEnv * env, jobject obj){
 
-} // extern "C"
+    jintArray color;
+    color = env->NewIntArray(3);
+    if (color == NULL) {
+        return NULL;
+    }
+    osg::Vec4 vTemp1 = mainApp.getClearColor();
 
+    jint vTemp2[3];
+
+    vTemp2[0] = (int) (vTemp1.r() * 255);
+    vTemp2[1] = (int) (vTemp1.g() * 255);
+    vTemp2[2] = (int) (vTemp1.b() * 255);
+
+    std::cout<<vTemp2[0]<<" "<<vTemp2[1]<<" "<<vTemp2[2]<<" "<<std::endl;
+
+    env->SetIntArrayRegion(color, 0, 3, vTemp2);
+
+    return color;
+}
+JNIEXPORT void JNICALL Java_osg_AndroidExample_osgNativeLib_setClearColor(JNIEnv * env, jobject obj, jint red, jint green, jint blue){
+    osg::Vec4 tVec((float) red / 255.0f, (float) green / 255.0f, (float) blue / 255.0f, 0.0f);
+    mainApp.setClearColor(tVec);
+}
+JNIEXPORT void JNICALL Java_osg_AndroidExample_osgNativeLib_loadObject(JNIEnv * env, jobject obj, jstring address){
+    //Import Strings from JNI
+    const char *nativeAddress = env->GetStringUTFChars(address, JNI_FALSE);
+
+    mainApp.loadObject(std::string(nativeAddress));
+
+    //Release Strings to JNI
+    env->ReleaseStringUTFChars(address, nativeAddress);
+}
+JNIEXPORT void JNICALL Java_osg_AndroidExample_osgNativeLib_loadObject(JNIEnv * env, jobject obj, jstring address, jstring name){
+    //Import Strings from JNI
+    const char *nativeAddress = env->GetStringUTFChars(address,JNI_FALSE);
+    const char *nativeName = env->GetStringUTFChars(name, JNI_FALSE);
+
+    mainApp.loadObject(std::string(nativeName),std::string(nativeAddress));
+
+    //Release Strings to JNI
+    env->ReleaseStringUTFChars(address, nativeAddress);
+    env->ReleaseStringUTFChars(address, nativeName);
+}
+JNIEXPORT void JNICALL Java_osg_AndroidExample_osgNativeLib_unLoadObject(JNIEnv * env, jobject obj, jint number){
+
+    mainApp.unLoadObject(number);
+
+}
+JNIEXPORT jobjectArray JNICALL Java_osg_AndroidExample_osgNativeLib_getObjectNames(JNIEnv * env, jobject obj){
+
+    jobjectArray fileNames;
+    unsigned int numModels = mainApp.getNumberObjects();
+    fileNames = (jobjectArray)env->NewObjectArray(numModels,env->FindClass("java/lang/String"),env->NewStringUTF(""));
+
+    for(unsigned int i=0;i < numModels;i++){
+        std::string name = mainApp.getObjectName(i);
+        env->SetObjectArrayElement(fileNames,i,env->NewStringUTF(name.c_str()));
+    }
+
+    return fileNames;
+}

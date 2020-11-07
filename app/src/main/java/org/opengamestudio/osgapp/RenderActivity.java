@@ -30,14 +30,14 @@ public class RenderActivity extends Activity implements View.OnTouchListener
         File dir = getFilesDir();
         String path = dir.getAbsolutePath();
         // Check if 'box.osgt' already exists.
-        String modelPath = path + "/box.osgt";
+        String modelPath = path + "/cow1.osgt";
         File model = new File(modelPath);
         // Copy 'box.ogst' from 'res/raw', if it does not exist.
         try {
             if (!model.exists()) {
                 // Note: this only works for small files,
                 // because we read the whole file into memory.
-                InputStream is = getResources().openRawResource(R.raw.cow);
+                InputStream is = getResources().openRawResource(R.raw.cow1);
                 byte[] buffer = new byte[is.available()];
                 is.read(buffer);
                 FileOutputStream os = new FileOutputStream(model);

@@ -18,10 +18,10 @@ INCLUDE_DIRECTORIES(${OSG_SOURCE_DIR}/include)
 INCLUDE_DIRECTORIES(${OSG_BUILD_DIR}/include)
 
 # Reference OpenSceneGraph cross-platform guide application.
-INCLUDE_DIRECTORIES("${EXT_PROJ_DIR}/openscenegraph-cross-platform-guide-application/android/src-gen")
+# INCLUDE_DIRECTORIES("./")
 
 # Build osgNativeLib.
-ADD_LIBRARY(osgNativeLib SHARED osgNativeLib.cpp)
+ADD_LIBRARY(osgNativeLib SHARED osgNativeLib.cpp OsgMainApp.cpp OsgAndroidNotifyHandler.cpp)
 FIND_LIBRARY(log-lib log)
 # Libraries must be linked in the specified order.
 # Otherwise you may get unsatisified linker errors.
@@ -29,16 +29,46 @@ TARGET_LINK_LIBRARIES(
     osgNativeLib
     ${log-lib}
     GLESv2
-    osgViewer
-    osgDB
     z
-    # osgDB plugins start.
+    osgdb_dds
+    osgdb_openflight
+    osgdb_tga
+    osgdb_rgb
+    osgdb_osgterrain
     osgdb_osg
+    osgdb_ive
+    osgdb_deprecated_osgviewer
+    osgdb_deprecated_osgvolume
+    osgdb_deprecated_osgtext
+    osgdb_deprecated_osgterrain
+    osgdb_deprecated_osgsim
+    osgdb_deprecated_osgshadow
+    osgdb_deprecated_osgparticle
+    osgdb_deprecated_osgfx
+    osgdb_deprecated_osganimation
+    osgdb_deprecated_osg
+    osgdb_serializers_osgvolume
+    osgdb_serializers_osgtext
+    osgdb_serializers_osgterrain
+    osgdb_serializers_osgsim
+    osgdb_serializers_osgshadow
+    osgdb_serializers_osgparticle
+    osgdb_serializers_osgmanipulator
+    osgdb_serializers_osgfx
+    osgdb_serializers_osganimation
     osgdb_serializers_osg
-    # osgDB plugins end.
-    osgGA
-    osgShadow
+    osgViewer
+    osgVolume
+    osgTerrain
     osgText
+    osgShadow
+    osgSim
+    osgParticle
+    osgManipulator
+    osgGA
+    osgFX
+    osgDB
+    osgAnimation
     osgUtil
     osg
     OpenThreads
